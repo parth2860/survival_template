@@ -26,4 +26,25 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//
+	void StartRandomWalk(); // Picks a random location to walk
+	void ChasePlayer(AActor* Player); // Starts chasing the player
+	void AttackPlayer(); // Attacks when in range
+	void OnSeePlayer(); // Called when the player is spotted
+	void MoveToLocation(const FVector& TargetLocation); // Corrected function
+
+
+	UPROPERTY(EditAnywhere, Category = "Zombie AI")
+	float DetectionRange = 800.0f; // Sight range
+
+	UPROPERTY(EditAnywhere, Category = "Zombie AI")
+	float AttackRange = 120.0f; // Attack range
+
+	UPROPERTY(EditAnywhere, Category = "Zombie AI")
+	float WalkRadius = 600.0f; // Random movement range
+
+	UPROPERTY(EditAnywhere, Category = "Zombie AI")
+	float AttackDamage = 20.0f; // Damage per attack
+
+	FTimerHandle RandomWalkTimerHandle;
 };
