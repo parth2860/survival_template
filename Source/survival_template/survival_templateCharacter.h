@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "player_state.h"
 #include "Logging/LogMacros.h"
 #include "survival_templateCharacter.generated.h"
 
@@ -44,6 +45,14 @@ class Asurvival_templateCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* Craft_Action;
+
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* Fire_Action;
+
 public:
 	Asurvival_templateCharacter();
 	
@@ -55,6 +64,12 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	/** Called for crefting input */
+	void Craft(const FInputActionValue& Value);
+
+	/** Called for fire input */
+	void Fire(const FInputActionValue& Value);
 			
 
 protected:
@@ -69,5 +84,9 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	//player state/component component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats")
+	Uplayer_state* PlayerStateComponent;
 };
 

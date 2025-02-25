@@ -4,6 +4,7 @@
 #include "resource_item.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "player_state.h"
 #include "GameFramework/Character.h"
 
 
@@ -59,5 +60,22 @@ void Aresource_item::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
 
         // Destroy the resource after collection
         Destroy();
+    }
+    //
+    {
+        if (OtherActor)
+        {
+            ACharacter* PlayerCharacter = Cast<ACharacter>(OtherActor);
+            if (PlayerCharacter)
+            {
+                Uplayer_state* PlayerState = PlayerCharacter->FindComponentByClass<Uplayer_state>();
+                if (PlayerState)
+                {
+                    FString ResourceName = (ResourceType == EResourceType::Wood) ? "Wood" : "Stone";
+                    PlayerState->CollectResource(ResourceName, 1);
+                    Destroy();
+                }
+            }
+        }
     }
 }

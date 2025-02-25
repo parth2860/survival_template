@@ -52,6 +52,10 @@ Asurvival_templateCharacter::Asurvival_templateCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	// In Constructor
+	PlayerStateComponent = CreateDefaultSubobject<Uplayer_state>(TEXT("PlayerStateComponent"));
+
 }
 
 void Asurvival_templateCharacter::BeginPlay()
@@ -86,6 +90,12 @@ void Asurvival_templateCharacter::SetupPlayerInputComponent(UInputComponent* Pla
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &Asurvival_templateCharacter::Look);
+
+		// crafting
+		EnhancedInputComponent->BindAction(Craft_Action, ETriggerEvent::Triggered, this, &Asurvival_templateCharacter::Craft);
+
+		// fore
+		EnhancedInputComponent->BindAction(Fire_Action, ETriggerEvent::Triggered, this, &Asurvival_templateCharacter::Fire);
 	}
 	else
 	{
@@ -127,4 +137,15 @@ void Asurvival_templateCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+void Asurvival_templateCharacter::Craft(const FInputActionValue& Value)
+{
+	if (PlayerStateComponent)
+	{
+		PlayerStateComponent->CraftWeapon();
+	}
+}
+void Asurvival_templateCharacter::Fire(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("attack"));
 }
