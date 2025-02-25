@@ -24,5 +24,24 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+    // Player Health
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+    float Health;
+
+    // Player Stamina
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+    float Stamina;
+
+    // Collected Wood & Stone
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Resources")
+    int32 WoodCount;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Resources")
+    int32 StoneCount;
+
+    // Function to Collect Resource
+    void CollectResource(FString ResourceType, int32 Amount);
+
+    // Function to Craft Weapon
+    bool CraftWeapon();
 };
