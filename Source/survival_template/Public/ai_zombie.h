@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/DamageType.h"
+#include "GameFramework/Controller.h"
+#include "Engine/DamageEvents.h"
 #include "ai_zombie.generated.h"
 
 UCLASS()
@@ -26,7 +29,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//
+	//zombie walk
 	void StartRandomWalk(); // Picks a random location to walk
 	void ChasePlayer(AActor* Player); // Starts chasing the player
 	void AttackPlayer(); // Attacks when in range
@@ -47,4 +50,16 @@ public:
 	float AttackDamage = 20.0f; // Damage per attack
 
 	FTimerHandle RandomWalkTimerHandle;
+
+	//zombie attack
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	UAnimMontage* AttackMontage;
+
+	int HitCount = 0;
+	int MaxHits = 2; // Zombie dies after 2 hits
+
+	void Die();
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,class AController* EventInstigator, AActor* DamageCauser) override;
+
 };

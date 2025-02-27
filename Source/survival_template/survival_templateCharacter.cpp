@@ -148,4 +148,22 @@ void Asurvival_templateCharacter::Craft(const FInputActionValue& Value)
 void Asurvival_templateCharacter::Fire(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("attack"));
+
+	//
+	FVector Start = GetActorLocation();
+	FVector ForwardVector = GetActorForwardVector();
+	FVector End = Start + (ForwardVector * AttackRange);
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params))
+	{
+		Aai_zombie* Zombie = Cast<Aai_zombie>(HitResult.GetActor());
+		if (Zombie)
+		{
+			Zombie->TakeDamage(1.0f, FDamageEvent(), GetController(), this);
+		}
+	}
 }

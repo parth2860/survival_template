@@ -7,6 +7,9 @@
 #include "NavigationPath.h"
 #include "AIController.h"
 #include "GameFramework/Controller.h"  // Use this instead of AIController.h
+#include "GameFramework/Character.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/AnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -118,7 +121,14 @@ void Aai_zombie::AttackPlayer()
     AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
     if (Player)
     {
-        // Apply damage
+        // Play attack animation
+        UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+        if (AnimInstance && AttackMontage)  // Ensure montage is valid
+        {
+            AnimInstance->Montage_Play(AttackMontage);
+        }
+
+        // Apply damage (optional: delay damage to sync with animation impact)
         UGameplayStatics::ApplyDamage(Player, AttackDamage, GetController(), this, nullptr);
     }
 }
@@ -130,7 +140,26 @@ void Aai_zombie::MoveToLocation(const FVector& TargetLocation)
         AIController->MoveToLocation(TargetLocation);
     }
 }
-//-------------------------------------
+//zombie attack-------------------------------------
+float Aai_zombie::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,AController* EventInstigator, AActor* DamageCauser)
+{
+    Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+    HitCount++;
+
+    if (HitCount >= MaxHits)
+    {
+        Die();
+    }
+
+    return DamageAmount;
+
+}
+
+void Aai_zombie::Die()
+{
+    Destroy();
+}
 
 
 

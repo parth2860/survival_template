@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "player_state.h"
 #include "Logging/LogMacros.h"
+#include "ai_zombie.h"
 #include "survival_templateCharacter.generated.h"
 
 class USpringArmComponent;
@@ -88,5 +89,7 @@ public:
 	//player state/component component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats")
 	Uplayer_state* PlayerStateComponent;
+
+	float AttackRange = 200.0f; // Define attack range
 };
 
