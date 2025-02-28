@@ -1,10 +1,19 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "day_night_manager.generated.h"
+
+UENUM(BlueprintType)
+enum class EDayTime : uint8
+{
+	Morning     UMETA(DisplayName = "Morning"),
+	Afternoon   UMETA(DisplayName = "Afternoon"),
+	Evening     UMETA(DisplayName = "Evening"),
+	Night       UMETA(DisplayName = "Night")
+};
 
 UCLASS()
 class SURVIVAL_TEMPLATE_API Aday_night_manager : public AActor
@@ -23,19 +32,22 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// The Sun Light (Directional Light)
 	UPROPERTY(EditAnywhere, Category = "DayNight")
-	class ADirectionalLight* SunLight;
+	class ADirectionalLight* SunLight;  // Sun
 
-	// Time Speed (How fast day/night cycle progresses)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight")
-	float TimeSpeed = 1.0f;//0.4f;  // 1 min full day cycle
+	UPROPERTY(EditAnywhere, Category = "DayNight")
+	AActor* SkySphere;  // SkySphere Actor
 
-	// Current time of day (0 to 24)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight")
-	float TimeOfDay = 12.0f;//6.0f
+	UPROPERTY(EditAnywhere, Category = "DayNight")
+	class ASkyLight* SkyLight;  // Ambient Light
 
-private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight", meta = (AllowPrivateAccess = "true"))
+	float TimeOfDay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight", meta = (AllowPrivateAccess = "true"))
+	float TimeSpeed;
+
 	void UpdateSunPosition();
-
+	void UpdateSkySphere();
+	void AdjustLighting();
 };
