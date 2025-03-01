@@ -147,9 +147,14 @@ void Asurvival_templateCharacter::Craft(const FInputActionValue& Value)
 }
 void Asurvival_templateCharacter::Fire(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("attack"));
-
 	//
+	UE_LOG(LogTemp, Warning, TEXT("Attack Triggered"));
+	
+	// Play Attack Montage
+	PlayAnimMontage(AttackMontage);
+	
+
+	// Line Trace for Attack
 	FVector Start = GetActorLocation();
 	FVector ForwardVector = GetActorForwardVector();
 	FVector End = Start + (ForwardVector * AttackRange);
@@ -166,4 +171,56 @@ void Asurvival_templateCharacter::Fire(const FInputActionValue& Value)
 			Zombie->TakeDamage(1.0f, FDamageEvent(), GetController(), this);
 		}
 	}
+	//
+	/*if (!bIsWeaponEquipped || !EquippedWeapon)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Weapon Equipped!"));
+		return;
+	}*/
+
+	UE_LOG(LogTemp, Warning, TEXT("Attack Triggered"));
+
+	//// Play Attack Montage
+	//if (AttackMontage)
+	//{
+	//	PlayAnimMontage(AttackMontage);
+	////	GetWorldTimerManager().SetTimerForNextTick(this, &Asurvival_templateCharacter::OnAttackMontageEnded);
+	//}
+
+	//// Enable weapon collision temporarily
+	//EquippedWeapon->WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+	//// Sphere Trace for Attack
+	//FVector Start = GetActorLocation();
+	//FVector End = Start + (GetActorForwardVector() * AttackRadius);
+
+	//TArray<AActor*> IgnoredActors;
+	//IgnoredActors.Add(this);
+
+	//FHitResult HitResult;
+	//bool bHit = UKismetSystemLibrary::SphereTraceSingle(this,Start,End,AttackRadius,UEngineTypes::ConvertToTraceType(ECC_Visibility),false,IgnoredActors,EDrawDebugTrace::ForDuration,HitResult,true);
+
+	//if (bHit)
+	//{
+	//	Aai_zombie* Zombie = Cast<Aai_zombie>(HitResult.GetActor());
+	//	if (Zombie)
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("Zombie Hit!"));
+	//		Zombie->TakeDamage(1.0f, FDamageEvent(), GetController(), this);
+	//	}
+	//}
+
+	
 }
+//// Set Weapon Equipped State
+//void Asurvival_templateCharacter::SetWeaponEquipped(bool bEquipped)
+//{
+//	bIsWeaponEquipped = bEquipped;
+//}
+//
+//// Set Equipped Weapon Reference
+//void Asurvival_templateCharacter::SetEquippedWeapon(Acp_weapon* Weapon)
+//{
+//	EquippedWeapon = Weapon;
+//}
+//
