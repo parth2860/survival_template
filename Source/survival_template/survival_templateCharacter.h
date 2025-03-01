@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -98,24 +98,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	UAnimMontage* AttackMontage;
 
-	// Currently Equipped Weapon
+	//// Currently Equipped Weapon
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	//Acp_weapon* EquippedWeapon;
+
+	// ✅ Simple Boolean to Check Weapon Status
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
-	Acp_weapon* EquippedWeapon;
-
-	//void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-
-	//// Set Weapon Equipped Status
-	//void SetWeaponEquipped(bool bEquipped);
-
-	//// Set Equipped Weapon Reference
-	//void SetEquippedWeapon(Acp_weapon* Weapon);
-
-	//// Boolean to track if a weapon is equipped
-	//bool bIsWeaponEquipped = false;
-
-	//// Attack Range (Sphere Trace Radius)
-	//UPROPERTY(EditAnywhere, Category = "Combat")
-	//float AttackRadius = 150.0f;
+	bool bHasWeapon = false;
 
 
 };

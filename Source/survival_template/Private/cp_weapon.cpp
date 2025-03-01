@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "cp_weapon.h"
@@ -17,6 +17,11 @@ Acp_weapon::Acp_weapon()
     PickupSphere = CreateDefaultSubobject<USphereComponent>(TEXT("PickupSphere"));
     PickupSphere->SetupAttachment(WeaponMesh);
     PickupSphere->SetSphereRadius(100.0f);
+
+    //on pickuo
+    PickupSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    PickupSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+    PickupSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 
     // Enable Overlap
     PickupSphere->OnComponentBeginOverlap.AddDynamic(this, &Acp_weapon::OnOverlapBegin);
@@ -43,6 +48,7 @@ void Acp_weapon::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
     if (Player)
     {
         AttachToPlayer(Player);
+        Player->bHasWeapon = true; // ✅ Set Boolean Variable in Player
     }
 }
 // Attach Weapon to Player (Directly handles attachment)
