@@ -106,6 +106,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	bool bHasWeapon = false;
 
+	void PerformWeaponTrace();
+
+	void PerformSphereTrace(UStaticMeshComponent* WeaponMesh);
+	
+
 
 };
 

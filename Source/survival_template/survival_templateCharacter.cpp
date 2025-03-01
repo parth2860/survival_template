@@ -162,7 +162,59 @@ void Asurvival_templateCharacter::Fire(const FInputActionValue& Value)
 		if (AttackMontage)
 		{
 			PlayAnimMontage(AttackMontage);
+			// ✅ Perform Trace Based on Weapon Type
+			PerformWeaponTrace();
 		}
 	}
 	
+}
+// **Weapon Trace Function**
+void Asurvival_templateCharacter::PerformWeaponTrace()
+{
+	if (USkeletalMeshComponent* SkeletalMeshComponent = GetMesh())
+	{
+		// Get all attached components (e.g., weapons)
+		const TArray<USceneComponent*>& AttachedComponents = SkeletalMeshComponent->GetAttachChildren();
+
+		for (USceneComponent* AttachedComponent : AttachedComponents)
+		{
+			// **Check if the attached component is a weapon**
+			if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(AttachedComponent))
+			{
+				FString WeaponName = StaticMeshComponent->GetName();
+
+				if (WeaponName == "WeaponMesh") // **Hammer (Sphere Trace)**
+				{
+					PerformSphereTrace(StaticMeshComponent);
+				}
+			}
+		}
+	}
+}
+
+// **Sphere Trace (For Hammer)**
+void Asurvival_templateCharacter::PerformSphereTrace(UStaticMeshComponent* WeaponMesh)
+{
+	FVector StartTrace = WeaponMesh->GetSocketLocation(TEXT("impact_center"));
+
+	float SphereRadius = 40.0f; // Adjust the size as needed
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this); // Ignore the player
+	TArray<FHitResult> HitResults;
+
+	bool bHit = GetWorld()->SweepMultiByChannel(HitResults, StartTrace, StartTrace, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(SphereRadius), Params);
+
+	if (bHit)
+	{
+		for (const FHitResult& Hit : HitResults)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Sphere Trace Hit: %s"), *Hit.GetActor()->GetName());
+		}
+		DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Red, false, 2.0f);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Sphere Trace Missed."));
+		DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Green, false, 2.0f);
+	}
 }
