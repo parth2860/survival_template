@@ -70,8 +70,15 @@ public:
 
 	FTimerHandle TimerHandle_Destroy;
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Combat")
-	void bp_call();
+	/*UFUNCTION(BlueprintImplementableEvent, Category = "Combat")
+	void bp_call();*/
 
+	bool bIsAttacking = false;
+	FTimerHandle TimerHandle_ResetAttack; // Timer to reset attack state
+	void ResetAttack();
+
+
+	int32 PlayerHitCount = 0; // Track number of hits on the player
+	const int32 MaxHitsBeforeDeath = 10; // Player dies after 10 hits
 
 };

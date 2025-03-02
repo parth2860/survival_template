@@ -118,20 +118,41 @@ void Aai_zombie::ChasePlayer(AActor* Player)
 
 void Aai_zombie::AttackPlayer()
 {
+    if (bIsAttacking) return; // Prevent re-attacking while montage is playing
+
     AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
     if (Player)
     {
-        // Play attack animation
         UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-        if (AnimInstance && AttackMontage)  // Ensure montage is valid
+        if (AnimInstance && AttackMontage)
         {
+            bIsAttacking = true; // Lock attack until montage completes
             AnimInstance->Montage_Play(AttackMontage);
+
+            // Reset attack state after montage duration
+            float MontageDuration = AttackMontage->GetPlayLength();
+            GetWorld()->GetTimerManager().SetTimer(TimerHandle_ResetAttack, this, &Aai_zombie::ResetAttack, MontageDuration, false);
         }
 
-        // Apply damage (optional: delay damage to sync with animation impact)
+        // Apply damage and count hits
+        PlayerHitCount++; // Increase hit count
         UGameplayStatics::ApplyDamage(Player, AttackDamage, GetController(), this, nullptr);
+
+        // Check if player should die
+        if (PlayerHitCount >= MaxHitsBeforeDeath)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Player has been hit 10 times! Player dies."));
+            Player->Destroy(); // Destroy the player actor
+        }
     }
 }
+
+// Reset function to allow another attack
+void Aai_zombie::ResetAttack()
+{
+    bIsAttacking = false; // Allow attacking again
+}
+
 void Aai_zombie::MoveToLocation(const FVector& TargetLocation)
 {
     AAIController* AIController = Cast<AAIController>(GetController());
@@ -162,7 +183,7 @@ float Aai_zombie::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 void Aai_zombie::Die()
 {
     //
-    bp_call();
+   /* bp_call();*/
     //
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
