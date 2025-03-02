@@ -116,6 +116,9 @@ public:
 	void OnAttackNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 
 
+	void StartCraftingProcess();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting part")
+	void crafting_process();
 };
 

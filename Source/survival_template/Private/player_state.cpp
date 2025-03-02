@@ -2,6 +2,7 @@
 
 
 #include "player_state.h"
+#include "survival_template/survival_templateCharacter.h"
 
 // Sets default values for this component's properties
 Uplayer_state::Uplayer_state()
@@ -54,12 +55,57 @@ void Uplayer_state::CollectResource(FString ResourceType, int32 Amount)
 // Craft a Weapon (Requires 5 Wood & 5 Stone)
 bool Uplayer_state::CraftWeapon()
 {
+    //if (bIsCrafting)
+    //{
+    //    UE_LOG(LogTemp, Warning, TEXT("Already crafting! Please wait."));
+    //    return false;
+    //}
+
+    //if (WoodCount >= 5 && StoneCount >= 5)
+    //{
+    //    WoodCount -= 5;
+    //    StoneCount -= 5;
+    //    bIsCrafting = true; // Start crafting process
+
+    //    UE_LOG(LogTemp, Warning, TEXT("Crafting started... (Time: %.1f seconds)"), CraftingTime);
+
+    //    // Start crafting timer
+    //   // GetWorld()->GetTimerManager().SetTimer(CraftingTimerHandle, this, &Uplayer_state::FinishCrafting, CraftingTime, false);
+    //    //call player class fucntion
+    //   
+
+    //    return true; // Crafting started
+    //}
+    //else
+    //{
+    //    UE_LOG(LogTemp, Warning, TEXT("Not enough resources to craft a weapon!"));
+    //    return false; // Not enough resources
+    //}
+    //
+    if (bIsCrafting)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Already crafting! Please wait."));
+        return false;
+    }
+
     if (WoodCount >= 5 && StoneCount >= 5)
     {
         WoodCount -= 5;
         StoneCount -= 5;
-        UE_LOG(LogTemp, Warning, TEXT("Weapon Crafted! Remaining - Wood: %d, Stone: %d"), WoodCount, StoneCount);
-        return true; // Successfully crafted
+        bIsCrafting = true; // Start crafting process
+
+       // UE_LOG(LogTemp, Warning, TEXT("Crafting started... (Time: %.1f seconds)"), CraftingTime);
+
+        // Get the Player Character
+        Asurvival_templateCharacter* Player = Cast<Asurvival_templateCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+        if (Player)
+        {
+            Player->StartCraftingProcess();
+            //UE_LOG(LogTemp, Warning, TEXT("calling player class for process!"));
+        }
+
+        return true; // Crafting started
     }
     else
     {
@@ -67,4 +113,6 @@ bool Uplayer_state::CraftWeapon()
         return false; // Not enough resources
     }
 }
+
+
 

@@ -252,3 +252,22 @@ void Asurvival_templateCharacter::OnAttackNotify(FName NotifyName, const FBranch
 		PerformWeaponTrace();
 	}
 }
+void Asurvival_templateCharacter::StartCraftingProcess()
+{
+	//if (bIsCrafting)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Already crafting!"));
+	//	return;
+	//}
+
+	//UE_LOG(LogTemp, Warning, TEXT("Crafting in progress... Waiting %.1f seconds"), CraftingDuration);
+	//bIsCrafting = true; // Block further crafting
+
+	//// Start crafting timer
+	//GetWorld()->GetTimerManager().SetTimer(CraftingTimerHandle, this, &Asurvival_templateCharacter::FinishCrafting, CraftingDuration, false);
+	UE_LOG(LogTemp, Warning, TEXT(" crafting process!"));
+
+    crafting_process();
+
+}
+

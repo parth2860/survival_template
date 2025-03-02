@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+//#include "survival_template/survival_templateCharacter.h"
 #include "player_state.generated.h"
 
+//class survival_templateCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SURVIVAL_TEMPLATE_API Uplayer_state : public UActorComponent
@@ -44,4 +46,13 @@ public:
 
     // Function to Craft Weapon
     bool CraftWeapon();
+
+    FTimerHandle CraftingTimerHandle; // Timer to track crafting duration
+    bool bIsCrafting = false; // Prevent crafting spam
+    float CraftingTime = 30.0f; // Default crafting time (adjustable)
+
+    UPROPERTY(EditDefaultsOnly, Category = "Crafting")
+    TSubclassOf<AActor> WeaponClass; // Blueprint weapon class to spawn
+
+    
 };
