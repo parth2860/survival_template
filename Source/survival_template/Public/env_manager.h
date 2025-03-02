@@ -33,8 +33,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight")
 	float DayNightSpeed = 5.0f; // Speed of time progression
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DayNight")
-	float CurrentTime = 0.0f; // Tracks time in the day-night cycle
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight")
+	float CurrentTime = 6.0f; // Tracks time in the day-night cycle
 
 	UFUNCTION(BlueprintCallable, Category = "DayNight")
 	void RotateSun(float RotationAmount);
@@ -43,5 +43,12 @@ public:
 	float GetCurrentTime() const; // Returns current time of day
 
 	void PrintCurrentTimeEvent();//print  day event
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "spawn_event call")
+	void get_zombie();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "spawn_event call")
+	void get_resource();
+
 
 };
