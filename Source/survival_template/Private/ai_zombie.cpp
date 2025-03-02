@@ -146,6 +146,9 @@ float Aai_zombie::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
     Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
     HitCount++;
+    //
+    //Health -= DamageAmount;
+    UE_LOG(LogTemp, Warning, TEXT("%s took damage! Health: %f"), *GetName());
 
     if (HitCount >= MaxHits)
     {
@@ -153,14 +156,43 @@ float Aai_zombie::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
     }
 
     return DamageAmount;
+    
 
 }
-
 void Aai_zombie::Die()
 {
-    Destroy();
+    //
+    bp_call();
+    //
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+    if (!DeathMontage)  // Fix: Now correctly checking DeathMontage
+    {
+        UE_LOG(LogTemp, Error, TEXT("DeathMontage is NULL!"));
+        Destroy();  // Destroy immediately if no animation
+        return;
+    }
+
+    if (!AnimInstance)
+    {
+        UE_LOG(LogTemp, Error, TEXT("AnimInstance is NULL!"));
+        Destroy();  // Destroy immediately if animation fails
+        return;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Playing Death Animation!"));
+    AnimInstance->Montage_Play(DeathMontage);
+
+    // Destroy after death animation finishes
+    float MontageDuration = DeathMontage->GetPlayLength();
+    GetWorld()->GetTimerManager().SetTimer(TimerHandle_Destroy, this, &Aai_zombie::DestroyZombie, MontageDuration, false);
 }
 
 
+void Aai_zombie::DestroyZombie()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Destroying Zombie!"));
+    Destroy();
+}
 
 

@@ -103,13 +103,18 @@ public:
 	//Acp_weapon* EquippedWeapon;
 
 	// ✅ Simple Boolean to Check Weapon Status
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bHasWeapon = false;
 
+	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void PerformWeaponTrace();
 
 	void PerformSphereTrace(UStaticMeshComponent* WeaponMesh);
 	
+	// Function to handle animation notify events
+	UFUNCTION()
+	void OnAttackNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
+
 
 
 };

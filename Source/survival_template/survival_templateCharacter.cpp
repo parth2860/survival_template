@@ -71,6 +71,15 @@ void Asurvival_templateCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+	//
+	if (USkeletalMeshComponent* SkeletalMeshComp = GetMesh())
+	{
+		UAnimInstance* AnimInstance = SkeletalMeshComp->GetAnimInstance();
+		if (AnimInstance)
+		{
+			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &Asurvival_templateCharacter::OnAttackNotify);
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -196,19 +205,37 @@ void Asurvival_templateCharacter::PerformWeaponTrace()
 void Asurvival_templateCharacter::PerformSphereTrace(UStaticMeshComponent* WeaponMesh)
 {
 	FVector StartTrace = WeaponMesh->GetSocketLocation(TEXT("impact_center"));
-
-	float SphereRadius = 40.0f; // Adjust the size as needed
+	float SphereRadius = 40.0f; // Adjust the size if needed
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this); // Ignore the player
 	TArray<FHitResult> HitResults;
 
-	bool bHit = GetWorld()->SweepMultiByChannel(HitResults, StartTrace, StartTrace, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(SphereRadius), Params);
+	bool bHit = GetWorld()->SweepMultiByChannel(HitResults, StartTrace, StartTrace, FQuat::Identity, ECC_Pawn, FCollisionShape::MakeSphere(SphereRadius), Params);
 
 	if (bHit)
 	{
 		for (const FHitResult& Hit : HitResults)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Sphere Trace Hit: %s"), *Hit.GetActor()->GetName());
+			AActor* HitActor = Hit.GetActor();
+			if (HitActor)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Sphere Trace Hit: %s"), *HitActor->GetName());
+
+				// Check if the hit actor is a zombie (assuming your zombie class is AZombieCharacter)
+				Aai_zombie* Zombie = Cast<Aai_zombie>(HitActor);
+				if (Zombie)
+				{
+					// Apply damage to the zombie
+					Zombie->TakeDamage(1.0f, FDamageEvent(), GetController(), this);
+
+					// If zombie health reaches 0, destroy it
+					/*if (Zombie->Health <= 0)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("%s has died!"), *Zombie->GetName());
+						Zombie->Destroy();
+					}*/
+				}
+			}
 		}
 		DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Red, false, 2.0f);
 	}
@@ -216,5 +243,12 @@ void Asurvival_templateCharacter::PerformSphereTrace(UStaticMeshComponent* Weapo
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Sphere Trace Missed."));
 		DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Green, false, 2.0f);
+	}
+}
+void Asurvival_templateCharacter::OnAttackNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
+{
+	if (NotifyName == "AttackTrace") // Make sure this matches the Anim Notify name
+	{
+		PerformWeaponTrace();
 	}
 }

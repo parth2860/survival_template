@@ -55,11 +55,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	UAnimMontage* AttackMontage;
 
-	int HitCount = 0;
-	int MaxHits = 2; // Zombie dies after 2 hits
+	int HitCount = 2;
+	int MaxHits = 15; // Zombie dies after 2 hits
 
 	void Die();
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,class AController* EventInstigator, AActor* DamageCauser) override;
+
+	// Attack Montage
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	UAnimMontage* DeathMontage;
+
+	void DestroyZombie();
+
+	FTimerHandle TimerHandle_Destroy;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Combat")
+	void bp_call();
+
 
 };
