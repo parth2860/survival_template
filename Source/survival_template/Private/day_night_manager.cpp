@@ -25,7 +25,7 @@ void Aday_night_manager::BeginPlay()
         // Start at night (11 PM)
         CurrentTime = 23.0f;
         UE_LOG(LogTemp, Warning, TEXT("Game starts at Night: %.1f"), CurrentTime);
-        SetNightEnvironment();
+        
     }
 }
 
@@ -48,100 +48,61 @@ void Aday_night_manager::Tick(float DeltaTime)
         PrintCurrentTimeEvent();
     }
 }
-
-// Rotate the directional light (Sun/Moon)
-void Aday_night_manager::RotateSun(float DeltaTime)
-{
-    if (LightActor)
-    {
-        float SunAngle = (CurrentTime / 24.0f) * 360.0f;
-
-        // Get the current rotation
-        FRotator CurrentRotation = LightActor->GetActorRotation();
-
-        // Create target rotation for smooth transition
-        FRotator TargetRotation = CurrentRotation;
-        TargetRotation.Pitch = SunAngle;
-
-        // Smoothly interpolate rotation using Lerp
-        FRotator SmoothedRotation = FMath::Lerp(CurrentRotation, TargetRotation, 0.05f); // 0.05f controls smoothness
-
-        // Apply the new rotation
-        LightActor->SetActorRotation(SmoothedRotation);
-    }
-}
-
-
-// Print and adjust environment based on time
-void Aday_night_manager::PrintCurrentTimeEvent()
-{
-    FString TimeEvent;
-
-    if (CurrentTime >= 18.0f || CurrentTime < 6.0f) // Nighttime (6 PM - 6 AM)
-    {
-        TimeEvent = "Night 🌙";
-        SetNightEnvironment();
-        GetZombie();
-    }
-    else if (CurrentTime >= 6.0f && CurrentTime < 18.0f) // Daytime (6 AM - 6 PM)
-    {
-        TimeEvent = "Morning ☀️";
-        SetDayEnvironment();
-        GetResource();
-    }
-    else // Evening Transition (6 PM - 7 PM)
-    {
-        TimeEvent = "Evening 🌅";
-        SetEveningEnvironment();
-    }
-
-    UE_LOG(LogTemp, Warning, TEXT("Current Time: %.1f - %s"), CurrentTime, *TimeEvent);
-}
-
-// Get current in-game time
 float Aday_night_manager::GetCurrentTime() const
 {
-    return CurrentTime;
+    return CurrentTime; // This is the missing definition
 }
 
-// Set nighttime environment
-void Aday_night_manager::SetNightEnvironment()
+void Aday_night_manager::RotateSun(float DeltaTime)
 {
+    //if (!LightActor) return;
     if (LightActor)
     {
-        UDirectionalLightComponent* LightComponent = Cast<UDirectionalLightComponent>(LightActor->GetLightComponent());
-        if (LightComponent)
-        {
-            LightComponent->SetIntensity(1.0f); // Dim the light
-            LightComponent->SetLightColor(FLinearColor(1.0f, 1.0f, 1.0f)); // Dark blue
-        }
+        // Increase rotation over time
+        float RotationAmount = DayNightSpeed * DeltaTime;
+
+        // Get current rotation as Quaternion
+        FQuat CurrentRotation = LightActor->GetActorQuat();
+
+        // Create a rotation Quaternion for the Pitch (Y-axis in Unreal)
+        FQuat RotationDelta = FQuat(FRotator(RotationAmount, 0.0f, 0.0f));
+
+        // Apply new rotation
+        LightActor->SetActorRotation(RotationDelta * CurrentRotation);
     }
 }
 
-// Set daytime environment
-void Aday_night_manager::SetDayEnvironment()
+void Aday_night_manager::PrintCurrentTimeEvent()
 {
-    if (LightActor)
+    if (!LightActor) return;
+
+    // Get the current Pitch rotation (Y-axis)
+    float SunPitch = LightActor->GetActorRotation().Euler().X; // Extract Pitch from Quaternion
+
+    FString NewTimePhase;
+
+    // Handle the expected range properly
+    if (SunPitch >= -90.0f && SunPitch < 0.0f)
     {
-        UDirectionalLightComponent* LightComponent = Cast<UDirectionalLightComponent>(LightActor->GetLightComponent());
-        if (LightComponent)
-        {
-            LightComponent->SetIntensity(5.0f); // Full brightness
-            LightComponent->SetLightColor(FLinearColor(1.0f, 0.95f, 0.85f)); // Warm yellow
-        }
+        NewTimePhase = "Day";  // Pitch -90 to 0 -> Daytime
+    }
+    else if (SunPitch >= 0.0f && SunPitch <= 90.0f)
+    {
+        NewTimePhase = "Night"; // Pitch 0 to 90 -> Nighttime
+    }
+    else
+    {
+        NewTimePhase = "Unknown"; // Handle unexpected cases
+    }
+
+    // Only update and log if the phase changed
+    if (!NewTimePhase.IsEmpty() && NewTimePhase != LastTimePhase)
+    {
+        LastTimePhase = NewTimePhase;
+        UE_LOG(LogTemp, Warning, TEXT("Time Phase Changed: %s"), *NewTimePhase);
     }
 }
 
-// Set evening environment
-void Aday_night_manager::SetEveningEnvironment()
-{
-    if (LightActor)
-    {
-        UDirectionalLightComponent* LightComponent = Cast<UDirectionalLightComponent>(LightActor->GetLightComponent());
-        if (LightComponent)
-        {
-            LightComponent->SetIntensity(2.5f); // Medium brightness
-            LightComponent->SetLightColor(FLinearColor(1.0f, 0.5f, 0.3f)); // Orange-red
-        }
-    }
-}
+
+
+

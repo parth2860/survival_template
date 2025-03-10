@@ -35,10 +35,12 @@ public:
 
     void PrintCurrentTimeEvent();
 
-    // Environmental settings
-    void SetNightEnvironment();
-    void SetDayEnvironment();
-    void SetEveningEnvironment();
+    //// Environmental settings
+    //void SetNightEnvironment();
+    //void SetDayEnvironment();
+    //void SetMorningEnvironment();
+    //void SetAfternoonEnvironment();
+    //void SetEveningEnvironment();
 
     // Blueprint event functions
     UFUNCTION(BlueprintImplementableEvent, Category = "SpawnEvent")
@@ -59,5 +61,9 @@ private:
     // Current in-game time
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight", meta = (AllowPrivateAccess = "true"))
     float CurrentTime = 6.0f;
+
+    UPROPERTY(VisibleAnywhere, Category = "DayNight")
+    FString LastTimePhase;
+
 
 };
