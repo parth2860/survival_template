@@ -1,111 +1,147 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
+﻿
 #include "day_night_manager.h"
-#include "Engine/World.h"
-#include "GameFramework/Actor.h"
 #include "Components/DirectionalLightComponent.h"
-#include "Engine/DirectionalLight.h"  // ✅ Add this to fix incomplete type error
-#include "Kismet/GameplayStatics.h"
-#include "Components/LightComponent.h"
-#include "Components/SkyLightComponent.h" // Fix for USkyLightComponent
-//#include "Engine/SkyAtmosphere.h"
-#include "Engine/SkyLight.h"         // ✅ Sky Light Component
+#include "Components/SkyLightComponent.h"
+#include "Components/ExponentialHeightFogComponent.h"
+//#include "Components/AtmosphericFogComponent.h"
+#include "Engine/DirectionalLight.h"
+#include "Engine/SkyLight.h"
+#include "Engine/ExponentialHeightFog.h"
+//#include "Engine/AtmosphericFog.h"
+//#include "Engine/SkyAtmosphere.h"  // ✅ Fixed for UE5
 
-
-// Sets default values
 Aday_night_manager::Aday_night_manager()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+    PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
+// BeginPlay
 void Aday_night_manager::BeginPlay()
 {
-	Super::BeginPlay();
-    // 🌞 Find Sun (Directional Light)
-    TArray<AActor*> FoundLights;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADirectionalLight::StaticClass(), FoundLights);
-    if (FoundLights.Num() > 0)
-    {
-        SunLight = Cast<ADirectionalLight>(FoundLights[0]);
-    }
+    Super::BeginPlay();
 
-    // 🌌 Find Sky Sphere (BP_SkySphere)
-    TArray<AActor*> FoundSkySpheres;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), FoundSkySpheres);
-    for (AActor* SkyActor : FoundSkySpheres)
+    if (LightActor)
     {
-        if (SkyActor->GetName().Contains("BP_SkySphere"))
-        {
-            SkySphere = SkyActor;
-            break;
-        }
-    }
-
-    // ☁️ Find Sky Light
-    TArray<AActor*> FoundSkyLights;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASkyLight::StaticClass(), FoundSkyLights);
-    if (FoundSkyLights.Num() > 0)
-    {
-        SkyLight = Cast<ASkyLight>(FoundSkyLights[0]);
+        // Start at night (11 PM)
+        CurrentTime = 23.0f;
+        UE_LOG(LogTemp, Warning, TEXT("Game starts at Night: %.1f"), CurrentTime);
+        SetNightEnvironment();
     }
 }
 
-// Called every frame
+// Tick function
 void Aday_night_manager::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+    Super::Tick(DeltaTime);
 
-    TimeOfDay += DeltaTime * TimeSpeed;
-    if (TimeOfDay >= 24.0f)
+    if (LightActor)
     {
-        TimeOfDay = 0.0f;
-    }
+        float RotationAmount = DayNightSpeed * DeltaTime;
+        RotateSun(RotationAmount);
 
-    UpdateSunPosition();
-    UpdateSkySphere();
-    AdjustLighting();
-}
-
-void Aday_night_manager::UpdateSunPosition()
-{
-    if (SunLight)
-    {
-        float SunPitch = (TimeOfDay / 24.0f) * 360.0f - 90.0f;
-        SunLight->SetActorRotation(FRotator(SunPitch, 0.0f, 0.0f));
-
-        float Intensity = (TimeOfDay >= 6.0f && TimeOfDay <= 18.0f) ? 10.0f : 0.2f; // 🔆 Adjusted night intensity
-        SunLight->GetLightComponent()->SetIntensity(Intensity);
-    }
-}
-
-void Aday_night_manager::UpdateSkySphere()
-{
-    if (SkySphere)
-    {
-        UFunction* RefreshFunction = SkySphere->FindFunction(TEXT("RefreshMaterial"));
-        if (RefreshFunction)
+        CurrentTime += (RotationAmount / 360.0f) * 24.0f;
+        if (CurrentTime >= 24.0f)
         {
-            SkySphere->ProcessEvent(RefreshFunction, nullptr);
+            CurrentTime = 0.0f; // Reset after a full cycle
+        }
+
+        PrintCurrentTimeEvent();
+    }
+}
+
+// Rotate the directional light (Sun/Moon)
+void Aday_night_manager::RotateSun(float DeltaTime)
+{
+    if (LightActor)
+    {
+        float SunAngle = (CurrentTime / 24.0f) * 360.0f;
+
+        // Get the current rotation
+        FRotator CurrentRotation = LightActor->GetActorRotation();
+
+        // Create target rotation for smooth transition
+        FRotator TargetRotation = CurrentRotation;
+        TargetRotation.Pitch = SunAngle;
+
+        // Smoothly interpolate rotation using Lerp
+        FRotator SmoothedRotation = FMath::Lerp(CurrentRotation, TargetRotation, 0.05f); // 0.05f controls smoothness
+
+        // Apply the new rotation
+        LightActor->SetActorRotation(SmoothedRotation);
+    }
+}
+
+
+// Print and adjust environment based on time
+void Aday_night_manager::PrintCurrentTimeEvent()
+{
+    FString TimeEvent;
+
+    if (CurrentTime >= 18.0f || CurrentTime < 6.0f) // Nighttime (6 PM - 6 AM)
+    {
+        TimeEvent = "Night 🌙";
+        SetNightEnvironment();
+        GetZombie();
+    }
+    else if (CurrentTime >= 6.0f && CurrentTime < 18.0f) // Daytime (6 AM - 6 PM)
+    {
+        TimeEvent = "Morning ☀️";
+        SetDayEnvironment();
+        GetResource();
+    }
+    else // Evening Transition (6 PM - 7 PM)
+    {
+        TimeEvent = "Evening 🌅";
+        SetEveningEnvironment();
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Current Time: %.1f - %s"), CurrentTime, *TimeEvent);
+}
+
+// Get current in-game time
+float Aday_night_manager::GetCurrentTime() const
+{
+    return CurrentTime;
+}
+
+// Set nighttime environment
+void Aday_night_manager::SetNightEnvironment()
+{
+    if (LightActor)
+    {
+        UDirectionalLightComponent* LightComponent = Cast<UDirectionalLightComponent>(LightActor->GetLightComponent());
+        if (LightComponent)
+        {
+            LightComponent->SetIntensity(1.0f); // Dim the light
+            LightComponent->SetLightColor(FLinearColor(1.0f, 1.0f, 1.0f)); // Dark blue
         }
     }
 }
 
-void Aday_night_manager::AdjustLighting()
+// Set daytime environment
+void Aday_night_manager::SetDayEnvironment()
 {
-    if (SkyLight)
+    if (LightActor)
     {
-        USkyLightComponent* SkyLightComponent = SkyLight->GetLightComponent();
-        if (SkyLightComponent)
+        UDirectionalLightComponent* LightComponent = Cast<UDirectionalLightComponent>(LightActor->GetLightComponent());
+        if (LightComponent)
         {
-            float SkyBrightness = (TimeOfDay >= 18.0f || TimeOfDay <= 6.0f) ? 0.3f : 3.0f; // 🌙 Night brightness boost
-            SkyLightComponent->SetIntensity(SkyBrightness);
+            LightComponent->SetIntensity(5.0f); // Full brightness
+            LightComponent->SetLightColor(FLinearColor(1.0f, 0.95f, 0.85f)); // Warm yellow
+        }
+    }
+}
 
-            // 🔥 THIS LINE FIXES THE BLACK NIGHT ISSUE!
-            SkyLightComponent->RecaptureSky();
+// Set evening environment
+void Aday_night_manager::SetEveningEnvironment()
+{
+    if (LightActor)
+    {
+        UDirectionalLightComponent* LightComponent = Cast<UDirectionalLightComponent>(LightActor->GetLightComponent());
+        if (LightComponent)
+        {
+            LightComponent->SetIntensity(2.5f); // Medium brightness
+            LightComponent->SetLightColor(FLinearColor(1.0f, 0.5f, 0.3f)); // Orange-red
         }
     }
 }

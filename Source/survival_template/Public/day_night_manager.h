@@ -4,16 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Engine/World.h"
+#include "Components/LightComponent.h"
+#include "Engine/DirectionalLight.h"
 #include "day_night_manager.generated.h"
-
-UENUM(BlueprintType)
-enum class EDayTime : uint8
-{
-	Morning     UMETA(DisplayName = "Morning"),
-	Afternoon   UMETA(DisplayName = "Afternoon"),
-	Evening     UMETA(DisplayName = "Evening"),
-	Night       UMETA(DisplayName = "Night")
-};
 
 UCLASS()
 class SURVIVAL_TEMPLATE_API Aday_night_manager : public AActor
@@ -29,25 +23,41 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, Category = "DayNight")
-	class ADirectionalLight* SunLight;  // Sun
+    // Day/Night cycle logic
+    UFUNCTION(BlueprintCallable, Category = "DayNight")
+    void RotateSun(float RotationAmount);
 
-	UPROPERTY(EditAnywhere, Category = "DayNight")
-	AActor* SkySphere;  // SkySphere Actor
+    UFUNCTION(BlueprintCallable, Category = "DayNight")
+    float GetCurrentTime() const;
 
-	UPROPERTY(EditAnywhere, Category = "DayNight")
-	class ASkyLight* SkyLight;  // Ambient Light
+    void PrintCurrentTimeEvent();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight", meta = (AllowPrivateAccess = "true"))
-	float TimeOfDay;
+    // Environmental settings
+    void SetNightEnvironment();
+    void SetDayEnvironment();
+    void SetEveningEnvironment();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight", meta = (AllowPrivateAccess = "true"))
-	float TimeSpeed;
+    // Blueprint event functions
+    UFUNCTION(BlueprintImplementableEvent, Category = "SpawnEvent")
+    void GetZombie();
 
-	void UpdateSunPosition();
-	void UpdateSkySphere();
-	void AdjustLighting();
+    UFUNCTION(BlueprintImplementableEvent, Category = "SpawnEvent")
+    void GetResource();
+
+private:
+    // Directional Light Reference
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight", meta = (AllowPrivateAccess = "true"))
+    ADirectionalLight* LightActor;
+
+    // Speed of the day-night cycle
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight", meta = (AllowPrivateAccess = "true"))
+    float DayNightSpeed = 5.0f;
+
+    // Current in-game time
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight", meta = (AllowPrivateAccess = "true"))
+    float CurrentTime = 6.0f;
+
 };
