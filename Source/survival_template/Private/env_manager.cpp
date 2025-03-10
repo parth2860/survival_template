@@ -71,7 +71,7 @@ void Aenv_manager::PrintCurrentTimeEvent()
         get_resource();
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("Current Time: %.1f - %s"), CurrentTime, *TimeEvent);
+   // UE_LOG(LogTemp, Warning, TEXT("Current Time: %.1f - %s"), CurrentTime, *TimeEvent);
 }
 
 float Aenv_manager::GetCurrentTime() const

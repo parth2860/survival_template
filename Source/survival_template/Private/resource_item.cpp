@@ -58,6 +58,9 @@ void Aresource_item::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
         UE_LOG(LogTemp, Warning, TEXT("Player collected: %s"),
             *UEnum::GetValueAsString(ResourceType));
 
+        //call here
+        set_ui();
+
         // Destroy the resource after collection
         Destroy();
     }
