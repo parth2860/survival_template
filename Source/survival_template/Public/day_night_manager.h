@@ -65,5 +65,5 @@ private:
     UPROPERTY(VisibleAnywhere, Category = "DayNight")
     FString LastTimePhase;
 
-
+    void UpdateCurrentTime();
 };

@@ -14,7 +14,6 @@ Aday_night_manager::Aday_night_manager()
 {
     PrimaryActorTick.bCanEverTick = true;
 }
-
 // BeginPlay
 void Aday_night_manager::BeginPlay()
 {
@@ -22,86 +21,90 @@ void Aday_night_manager::BeginPlay()
 
     if (LightActor)
     {
-        // Start at night (11 PM)
+        // Start the game at night (11 PM)
         CurrentTime = 23.0f;
         UE_LOG(LogTemp, Warning, TEXT("Game starts at Night: %.1f"), CurrentTime);
-        
     }
 }
 
-// Tick function
+// Tick function (Runs every frame)
 void Aday_night_manager::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
     if (LightActor)
     {
-        float RotationAmount = DayNightSpeed * DeltaTime;
-        RotateSun(RotationAmount);
-
-        CurrentTime += (RotationAmount / 360.0f) * 24.0f;
-        if (CurrentTime >= 24.0f)
-        {
-            CurrentTime = 0.0f; // Reset after a full cycle
-        }
-
-        PrintCurrentTimeEvent();
+        RotateSun(DeltaTime);   // Rotate the sun
+        UpdateCurrentTime();    // Update the game time
+        PrintCurrentTimeEvent(); // Print day/night event if needed
     }
 }
+
+// Get current in-game time
 float Aday_night_manager::GetCurrentTime() const
 {
-    return CurrentTime; // This is the missing definition
+    return CurrentTime;
 }
 
+// Rotate the sun while keeping cycle smooth
 void Aday_night_manager::RotateSun(float DeltaTime)
 {
-    //if (!LightActor) return;
-    if (LightActor)
+    if (!LightActor) return;
+
+    float RotationAmount = DayNightSpeed * DeltaTime;
+
+    // Get current rotation
+    FRotator NewRotation = LightActor->GetActorRotation();
+    NewRotation.Pitch += RotationAmount;
+
+    // Keep rotation within valid range (-90 to 90)
+    if (NewRotation.Pitch > 90.0f)
     {
-        // Increase rotation over time
-        float RotationAmount = DayNightSpeed * DeltaTime;
-
-        // Get current rotation as Quaternion
-        FQuat CurrentRotation = LightActor->GetActorQuat();
-
-        // Create a rotation Quaternion for the Pitch (Y-axis in Unreal)
-        FQuat RotationDelta = FQuat(FRotator(RotationAmount, 0.0f, 0.0f));
-
-        // Apply new rotation
-        LightActor->SetActorRotation(RotationDelta * CurrentRotation);
+        NewRotation.Pitch = -90.0f; // Reset cycle to maintain smooth loop
     }
+
+    LightActor->SetActorRotation(NewRotation);
 }
 
+// Map sun position to a 24-hour clock
+void Aday_night_manager::UpdateCurrentTime()
+{
+    if (!LightActor) return;
+
+    float SunPitch = LightActor->GetActorRotation().Pitch; // Get Pitch
+
+    // Map Pitch (-90 to 90) to (0 to 24 hours)
+    CurrentTime = FMath::GetMappedRangeValueClamped(FVector2D(-90.0f, 90.0f), FVector2D(0.0f, 24.0f), SunPitch);
+}
+
+// Correctly detect Day/Night transitions
 void Aday_night_manager::PrintCurrentTimeEvent()
 {
     if (!LightActor) return;
 
-    // Get the current Pitch rotation (Y-axis)
-    float SunPitch = LightActor->GetActorRotation().Euler().X; // Extract Pitch from Quaternion
+    float SunPitch = LightActor->GetActorRotation().Pitch;
 
     FString NewTimePhase;
 
-    // Handle the expected range properly
+    // Day (SunPitch -90 to 0) | Night (SunPitch 0 to 90)
     if (SunPitch >= -90.0f && SunPitch < 0.0f)
     {
-        NewTimePhase = "Day";  // Pitch -90 to 0 -> Daytime
+        NewTimePhase = "Day";
     }
     else if (SunPitch >= 0.0f && SunPitch <= 90.0f)
     {
-        NewTimePhase = "Night"; // Pitch 0 to 90 -> Nighttime
-    }
-    else
-    {
-        NewTimePhase = "Unknown"; // Handle unexpected cases
+        NewTimePhase = "Night";
     }
 
-    // Only update and log if the phase changed
-    if (!NewTimePhase.IsEmpty() && NewTimePhase != LastTimePhase)
+    // Only log when the phase actually changes
+    if (NewTimePhase != LastTimePhase)
     {
         LastTimePhase = NewTimePhase;
         UE_LOG(LogTemp, Warning, TEXT("Time Phase Changed: %s"), *NewTimePhase);
     }
 }
+
+
 
 
 
