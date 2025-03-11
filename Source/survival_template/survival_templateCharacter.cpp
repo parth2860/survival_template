@@ -194,6 +194,7 @@ void Asurvival_templateCharacter::HandleStamina()
 		}
 		else if (PlayerStateComponent->Stamina < 100.0f)  // Only regenerate if stamina isn’t full
 		{
+			ui_stamina();
 			PlayerStateComponent->ModifyStamina(1.0f, StaminaRegenRate);  // Regenerate stamina
 			UE_LOG(LogTemp, Warning, TEXT("Stamina regeration: %.2f"), PlayerStateComponent->Stamina);
 		}

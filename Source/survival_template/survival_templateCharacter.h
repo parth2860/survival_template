@@ -146,5 +146,12 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting part")
 	void crafting_process();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting part")
+	void ui_health();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting part")
+	void ui_stamina();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting part")
+	void ui_resource();
 };
 
