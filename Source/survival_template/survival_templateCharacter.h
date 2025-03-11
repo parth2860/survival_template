@@ -48,6 +48,10 @@ class Asurvival_templateCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	/** Sprint Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SprintAction;
+
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* Craft_Action;
@@ -73,7 +77,12 @@ protected:
 
 	/** Called for fire input */
 	void Fire(const FInputActionValue& Value);
-			
+
+	/** Called for fire input */
+	//void Sprint(const FInputActionValue& Value);
+	void HandleStamina();
+	void StopSprinting();
+	void StartSprinting();
 
 protected:
 	// APawn interface
@@ -92,6 +101,23 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats")
 	Uplayer_state* PlayerStateComponent;
 
+	// Sprint Variables
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float NormalWalkSpeed = 500.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float SprintSpeed = 1200.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float StaminaDrainRate = 1.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float StaminaRegenRate = 0.10f;
+
+	// Timer for stamina management
+	FTimerHandle StaminaTimer;
+
+	//combat
 	float AttackRange = 200.0f; // Define attack range
 
 	// Attack Montage

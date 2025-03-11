@@ -113,6 +113,24 @@ bool Uplayer_state::CraftWeapon()
         return false; // Not enough resources
     }
 }
+//
+void Uplayer_state::ModifyHealth(float Delta, float Rate)
+{
+    Health += Delta * Rate;
+    Health = FMath::Clamp(Health, 0.0f, 100.0f);
+
+    // Print the health value in the output log
+    UE_LOG(LogTemp, Warning, TEXT("Current Health: %.2f"), Health);
+}
+
+void Uplayer_state::ModifyStamina(float Delta, float Rate)
+{
+    Stamina += Delta * Rate;
+    Stamina = FMath::Clamp(Stamina, 0.0f, 100.0f);
+
+    // Print the stamina value in the output log
+    UE_LOG(LogTemp, Warning, TEXT("Current Stamina: %.2f"), Stamina);
+}
 
 
 

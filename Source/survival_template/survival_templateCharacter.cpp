@@ -56,6 +56,8 @@ Asurvival_templateCharacter::Asurvival_templateCharacter()
 	// In Constructor
 	PlayerStateComponent = CreateDefaultSubobject<Uplayer_state>(TEXT("PlayerStateComponent"));
 
+	// Set default walk speed
+	GetCharacterMovement()->MaxWalkSpeed = NormalWalkSpeed;
 }
 
 void Asurvival_templateCharacter::BeginPlay()
@@ -71,7 +73,8 @@ void Asurvival_templateCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	//
+
+	// attck mmontage
 	if (USkeletalMeshComponent* SkeletalMeshComp = GetMesh())
 	{
 		UAnimInstance* AnimInstance = SkeletalMeshComp->GetAnimInstance();
@@ -99,6 +102,10 @@ void Asurvival_templateCharacter::SetupPlayerInputComponent(UInputComponent* Pla
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &Asurvival_templateCharacter::Look);
+
+		// Sprinting
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &Asurvival_templateCharacter::StartSprinting);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &Asurvival_templateCharacter::StopSprinting);
 
 		// crafting
 		EnhancedInputComponent->BindAction(Craft_Action, ETriggerEvent::Triggered, this, &Asurvival_templateCharacter::Craft);
@@ -147,11 +154,61 @@ void Asurvival_templateCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+void Asurvival_templateCharacter::StartSprinting()
+{
+	if (PlayerStateComponent && PlayerStateComponent->Stamina > 0.0f)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+		GetWorld()->GetTimerManager().SetTimer(StaminaTimer, this, &Asurvival_templateCharacter::HandleStamina, 0.1f, true);
+	}
+}
+
+// Stop Sprinting
+void Asurvival_templateCharacter::StopSprinting()
+{
+	//GetCharacterMovement()->MaxWalkSpeed = NormalWalkSpeed;
+	//GetWorld()->GetTimerManager().ClearTimer(StaminaTimer);  // Stop stamina drain
+	//
+	GetCharacterMovement()->MaxWalkSpeed = NormalWalkSpeed;
+
+	// Do NOT clear the timer here; let it run for stamina regeneration
+	if (!GetWorld()->GetTimerManager().IsTimerActive(StaminaTimer))
+	{
+		GetWorld()->GetTimerManager().SetTimer(StaminaTimer, this, &Asurvival_templateCharacter::HandleStamina, 0.1f, true);
+	}
+}
+
+// Handle Stamina Drain/Regeneration
+void Asurvival_templateCharacter::HandleStamina()
+{
+	if (PlayerStateComponent)
+	{
+		if (GetCharacterMovement()->MaxWalkSpeed == SprintSpeed)
+		{
+			PlayerStateComponent->ModifyStamina(-1.0f, StaminaDrainRate);  // Drain Stamina
+
+			if (PlayerStateComponent->Stamina <= 0.0f)
+			{
+				StopSprinting();  // Force stop sprinting
+			}
+		}
+		else if (PlayerStateComponent->Stamina < 100.0f)  // Only regenerate if stamina isn’t full
+		{
+			PlayerStateComponent->ModifyStamina(1.0f, StaminaRegenRate);  // Regenerate stamina
+			UE_LOG(LogTemp, Warning, TEXT("Stamina regeration: %.2f"), PlayerStateComponent->Stamina);
+		}
+
+		// Optional Debug Log to Track Stamina
+		//UE_LOG(LogTemp, Warning, TEXT("Stamina regeration: %.2f"), PlayerStateComponent->Stamina);
+	}
+}
 void Asurvival_templateCharacter::Craft(const FInputActionValue& Value)
 {
 	if (PlayerStateComponent)
 	{
-		PlayerStateComponent->CraftWeapon();
+		if(PlayerStateComponent->Stamina == 0)
+		{ }
+		
 	}
 }
 void Asurvival_templateCharacter::Fire(const FInputActionValue& Value)
