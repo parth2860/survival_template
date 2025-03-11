@@ -40,14 +40,21 @@ void Uplayer_state::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 // Collect Resources (Wood or Stone)
 void Uplayer_state::CollectResource(FString ResourceType, int32 Amount)
 {
+    // Get the Player Character
+    Asurvival_templateCharacter* Tp_Player = Cast<Asurvival_templateCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
     if (ResourceType == "Wood")
     {
+        if (WoodCount == 0) Amount = 1;  // Ensure first item is counted
         WoodCount += Amount;
+        Tp_Player->ui_wood();
         UE_LOG(LogTemp, Warning, TEXT("Collected %d Wood. Total: %d"), Amount, WoodCount);
     }
     else if (ResourceType == "Stone")
     {
+        if (StoneCount == 0) Amount = 1;  // Ensure first item is counted
         StoneCount += Amount;
+        Tp_Player->ui_rock();
         UE_LOG(LogTemp, Warning, TEXT("Collected %d Stone. Total: %d"), Amount, StoneCount);
     }
 }

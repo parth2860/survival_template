@@ -157,5 +157,10 @@ public:
 	void ui_stamina();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting part")
 	void ui_resource();
+	//
+	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting part")
+	void ui_wood();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting part")
+	void ui_rock();
 };
 

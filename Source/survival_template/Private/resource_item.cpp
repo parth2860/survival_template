@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "player_state.h"
+#include "survival_template/survival_templateCharacter.h"
 #include "GameFramework/Character.h"
 
 
@@ -62,7 +63,7 @@ void Aresource_item::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
         set_ui();
 
         // Destroy the resource after collection
-        Destroy();
+        //Destroy();
     }
     //
     {

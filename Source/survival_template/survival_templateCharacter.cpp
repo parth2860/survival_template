@@ -217,9 +217,7 @@ void Asurvival_templateCharacter::Craft(const FInputActionValue& Value)
 {
 	if (PlayerStateComponent)
 	{
-		if(PlayerStateComponent->Stamina == 0)
-		{ }
-		
+		PlayerStateComponent->CraftWeapon();
 	}
 }
 void Asurvival_templateCharacter::Fire(const FInputActionValue& Value)

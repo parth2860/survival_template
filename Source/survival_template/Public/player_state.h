@@ -62,5 +62,5 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Player Stats")
     void ModifyStamina(float Delta, float Rate);
 
-    
+   
 };
