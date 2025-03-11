@@ -219,6 +219,7 @@ void Asurvival_templateCharacter::Craft(const FInputActionValue& Value)
 	{
 		PlayerStateComponent->CraftWeapon();
 	}
+	void ui_resource();//ui update value
 }
 void Asurvival_templateCharacter::Fire(const FInputActionValue& Value)
 {
@@ -327,7 +328,6 @@ void Asurvival_templateCharacter::StartCraftingProcess()
 	//GetWorld()->GetTimerManager().SetTimer(CraftingTimerHandle, this, &Asurvival_templateCharacter::FinishCrafting, CraftingDuration, false);
 	UE_LOG(LogTemp, Warning, TEXT(" crafting process!"));
 
-    crafting_process();
-
+    crafting_process();//player state component function
 }
 

@@ -81,28 +81,6 @@ void Aday_night_manager::UpdateCurrentTime()
 // Correctly detect Day/Night transitions
 void Aday_night_manager::PrintCurrentTimeEvent()
 {
-    //if (!LightActor) return;
-
-    //float SunPitch = LightActor->GetActorRotation().Pitch;
-
-    //FString NewTimePhase;
-
-    //// Day (SunPitch -90 to 0) | Night (SunPitch 0 to 90)
-    //if (SunPitch >= -90.0f && SunPitch < 0.0f)
-    //{
-    //    NewTimePhase = "Day";
-    //}
-    //else if (SunPitch >= 0.0f && SunPitch <= 90.0f)
-    //{
-    //    NewTimePhase = "Night";
-    //}
-
-    //// Only log when the phase actually changes
-    //if (NewTimePhase != LastTimePhase)
-    //{
-    //    LastTimePhase = NewTimePhase;
-    //    UE_LOG(LogTemp, Warning, TEXT("Time Phase Changed: %s"), *NewTimePhase);
-    //}
     //--------------------//
     if(!LightActor) return;
 

@@ -59,7 +59,7 @@ void Asurvival_templateGameMode::OnDayStart()
     }
 
     // Spawn resources
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 20; i++)
     {
         FNavLocation RandomNavLocation;
         if (NavSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, 1000.0f, RandomNavLocation))
@@ -90,14 +90,45 @@ void Asurvival_templateGameMode::OnNightStart()
         (*ResourceItr)->Destroy();
     }
 
+    // Find Player Location
+    APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+    if (!PlayerController) return;
+
+    APawn* PlayerPawn = PlayerController->GetPawn();
+    if (!PlayerPawn) return;
+
+    FVector PlayerLocation = PlayerPawn->GetActorLocation();
+
+    const float SafeDistance = 1000.0f; // Minimum distance from player
+    const int MaxAttempts = 20;        // Prevent infinite loop in case no valid points are found
+
     // Spawn zombies
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 3; i++)
     {
-        FNavLocation RandomNavLocation;
-        if (NavSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, 1000.0f, RandomNavLocation))
+        int Attempts = 0;
+
+        while (Attempts < MaxAttempts)
         {
-            FVector SpawnLocation = RandomNavLocation.Location;
-            GetWorld()->SpawnActor<AActor>(ZombieClass, SpawnLocation, FRotator::ZeroRotator);
+            FNavLocation RandomNavLocation;
+            if (NavSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, 1000.0f, RandomNavLocation))
+            {
+                FVector SpawnLocation = RandomNavLocation.Location;
+
+                // Ensure zombie spawns a safe distance away from the player
+                if (FVector::Dist(SpawnLocation, PlayerLocation) > SafeDistance)
+                {
+                    GetWorld()->SpawnActor<AActor>(ZombieClass, SpawnLocation, FRotator::ZeroRotator);
+                    break; // Successfully spawned, move to next zombie
+                }
+            }
+
+            Attempts++; // Prevent infinite attempts
+        }
+
+        if (Attempts >= MaxAttempts)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Failed to find valid zombie spawn location after %d attempts."), MaxAttempts);
         }
     }
 }
+

@@ -120,15 +120,6 @@ bool Uplayer_state::CraftWeapon()
         return false; // Not enough resources
     }
 }
-//
-//void Uplayer_state::ModifyHealth(float Delta, float Rate)
-//{
-//    Health += Delta * Rate;
-//    Health = FMath::Clamp(Health, 0.0f, 100.0f);
-//
-//    // Print the health value in the output log
-//    UE_LOG(LogTemp, Warning, TEXT("Current Health: %.2f"), Health);
-//}
 void Uplayer_state::ModifyHealth(float DamageAmount)
 {
     // Reduce health by the incoming damage value

@@ -35,12 +35,7 @@ public:
 
     void PrintCurrentTimeEvent();
 
-    //// Environmental settings
-    //void SetNightEnvironment();
-    //void SetDayEnvironment();
-    //void SetMorningEnvironment();
-    //void SetAfternoonEnvironment();
-    //void SetEveningEnvironment();
+  
 
     // Blueprint event functions
     UFUNCTION(BlueprintImplementableEvent, Category = "SpawnEvent")
