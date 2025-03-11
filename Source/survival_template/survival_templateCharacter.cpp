@@ -229,7 +229,7 @@ void Asurvival_templateCharacter::Fire(const FInputActionValue& Value)
 		{
 			PlayAnimMontage(AttackMontage);
 			// ✅ Perform Trace Based on Weapon Type
-			PerformWeaponTrace();
+			//PerformWeaponTrace();
 		}
 	}
 	
@@ -294,12 +294,12 @@ void Asurvival_templateCharacter::PerformSphereTrace(UStaticMeshComponent* Weapo
 				}
 			}
 		}
-		//DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Red, false, 2.0f);
+		DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Red, false, 2.0f);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Sphere Trace Missed."));
-		//DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Green, false, 2.0f);
+		DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Green, false, 2.0f);
 	}
 }
 void Asurvival_templateCharacter::OnAttackNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
