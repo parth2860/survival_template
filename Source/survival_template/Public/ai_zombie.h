@@ -55,11 +55,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	UAnimMontage* AttackMontage;
 
-	int HitCount = 2;
-	int MaxHits = 15; // Zombie dies after 2 hits
+	//int HitCount = 2;
+	//int MaxHits = 15; // Zombie dies after 2 hits
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Zombie Stats")
+	float Health = 100.0f;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Zombie Stats")
+	void update_zombiestate();
 
 	void Die();
-
+	
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,class AController* EventInstigator, AActor* DamageCauser) override;
 
 	// Attack Montage

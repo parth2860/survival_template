@@ -164,20 +164,30 @@ void Aai_zombie::MoveToLocation(const FVector& TargetLocation)
 //zombie attack-------------------------------------
 float Aai_zombie::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,AController* EventInstigator, AActor* DamageCauser)
 {
+    //
+    update_zombiestate();
+    //
     Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-    HitCount++;
-    //
-    //Health -= DamageAmount;
-    UE_LOG(LogTemp, Warning, TEXT("%s took damage! Health: %f"), *GetName());
+    // Ensure Health starts at 100 if not already set
+    if (Health <= 0)
+    {
+        Health = 100.0f;
+    }
 
-    if (HitCount >= MaxHits)
+    // Reduce health by the incoming damage
+    Health -= DamageAmount;
+
+    // Log remaining health
+    UE_LOG(LogTemp, Warning, TEXT("%s took damage! Health: %f"), *GetName(), Health);
+
+    // Check if zombie should die
+    if (Health <= 0)
     {
         Die();
     }
 
     return DamageAmount;
-    
 
 }
 void Aai_zombie::Die()

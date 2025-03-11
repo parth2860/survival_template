@@ -283,8 +283,8 @@ void Asurvival_templateCharacter::PerformSphereTrace(UStaticMeshComponent* Weapo
 				if (Zombie)
 				{
 					// Apply damage to the zombie
-					Zombie->TakeDamage(1.0f, FDamageEvent(), GetController(), this);
-
+					Zombie->TakeDamage(5.0f, FDamageEvent(), GetController(), this);
+					
 					// If zombie health reaches 0, destroy it
 					/*if (Zombie->Health <= 0)
 					{
@@ -294,12 +294,12 @@ void Asurvival_templateCharacter::PerformSphereTrace(UStaticMeshComponent* Weapo
 				}
 			}
 		}
-		DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Red, false, 2.0f);
+		//DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Red, false, 2.0f);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Sphere Trace Missed."));
-		DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Green, false, 2.0f);
+		//DrawDebugSphere(GetWorld(), StartTrace, SphereRadius, 12, FColor::Green, false, 2.0f);
 	}
 }
 void Asurvival_templateCharacter::OnAttackNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
