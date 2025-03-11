@@ -114,14 +114,37 @@ bool Uplayer_state::CraftWeapon()
     }
 }
 //
-void Uplayer_state::ModifyHealth(float Delta, float Rate)
+//void Uplayer_state::ModifyHealth(float Delta, float Rate)
+//{
+//    Health += Delta * Rate;
+//    Health = FMath::Clamp(Health, 0.0f, 100.0f);
+//
+//    // Print the health value in the output log
+//    UE_LOG(LogTemp, Warning, TEXT("Current Health: %.2f"), Health);
+//}
+void Uplayer_state::ModifyHealth(float DamageAmount)
 {
-    Health += Delta * Rate;
+    // Reduce health by the incoming damage value
+    Health -= DamageAmount;
+
+    // Clamp the value between 0 and 100
     Health = FMath::Clamp(Health, 0.0f, 100.0f);
 
-    // Print the health value in the output log
-    UE_LOG(LogTemp, Warning, TEXT("Current Health: %.2f"), Health);
+    // Print updated health for debugging
+    UE_LOG(LogTemp, Warning, TEXT("Player Health: %.2f"), Health);
+
+    // Handle player death
+    if (Health <= 0.0f)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Player is dead!"));
+        AActor* Owner = GetOwner();
+        if (Owner)
+        {
+            Owner->Destroy();
+        }
+    }
 }
+
 
 void Uplayer_state::ModifyStamina(float Delta, float Rate)
 {

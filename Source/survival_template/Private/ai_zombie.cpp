@@ -10,6 +10,7 @@
 #include "GameFramework/Character.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
+#include "survival_template/survival_templateCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -115,34 +116,58 @@ void Aai_zombie::ChasePlayer(AActor* Player)
         AttackPlayer();
     }
 }
-
+//zombie player attack-------------------------------------
 void Aai_zombie::AttackPlayer()
 {
-    if (bIsAttacking) return; // Prevent re-attacking while montage is playing
+    //if (bIsAttacking) return; // Prevent re-attacking while montage is playing
 
-    AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-    if (Player)
+    //AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    //if (Player)
+    //{
+    //    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    //    if (AnimInstance && AttackMontage)
+    //    {
+    //        bIsAttacking = true; // Lock attack until montage completes
+    //        AnimInstance->Montage_Play(AttackMontage);
+
+    //        // Reset attack state after montage duration
+    //        float MontageDuration = AttackMontage->GetPlayLength();
+    //        GetWorld()->GetTimerManager().SetTimer(TimerHandle_ResetAttack, this, &Aai_zombie::ResetAttack, MontageDuration, false);
+    //    }
+
+    //    // Apply damage and count hits
+    //    PlayerHitCount++; // Increase hit count
+    //    UGameplayStatics::ApplyDamage(Player, AttackDamage, GetController(), this, nullptr);
+
+    //    // Check if player should die
+    //    if (PlayerHitCount >= MaxHitsBeforeDeath)
+    //    {
+    //        UE_LOG(LogTemp, Warning, TEXT("Player has been hit 10 times! Player dies."));
+    //        Player->Destroy(); // Destroy the player actor
+    //    }
+    //}
+    //
+    if (bIsAttacking) return;
+
+    AActor* PlayerActor = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    if (PlayerActor)
     {
         UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
         if (AnimInstance && AttackMontage)
         {
-            bIsAttacking = true; // Lock attack until montage completes
+            bIsAttacking = true;
             AnimInstance->Montage_Play(AttackMontage);
 
-            // Reset attack state after montage duration
             float MontageDuration = AttackMontage->GetPlayLength();
             GetWorld()->GetTimerManager().SetTimer(TimerHandle_ResetAttack, this, &Aai_zombie::ResetAttack, MontageDuration, false);
         }
 
-        // Apply damage and count hits
-        PlayerHitCount++; // Increase hit count
-        UGameplayStatics::ApplyDamage(Player, AttackDamage, GetController(), this, nullptr);
-
-        // Check if player should die
-        if (PlayerHitCount >= MaxHitsBeforeDeath)
+        // Access Player Class instead of directly calling Player State
+        //Asurvival_templateCharacter* PlayerCharacter = Cast<Asurvival_templateCharacter>(PlayerActor);
+        Asurvival_templateCharacter* PlayerCharacter = Cast<Asurvival_templateCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+        if (PlayerCharacter)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Player has been hit 10 times! Player dies."));
-            Player->Destroy(); // Destroy the player actor
+            PlayerCharacter->ManageHealth(); // Apply 10 damage to player
         }
     }
 }
@@ -161,7 +186,7 @@ void Aai_zombie::MoveToLocation(const FVector& TargetLocation)
         AIController->MoveToLocation(TargetLocation);
     }
 }
-//zombie attack-------------------------------------
+//zombie get attack-------------------------------------
 float Aai_zombie::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,AController* EventInstigator, AActor* DamageCauser)
 {
     //

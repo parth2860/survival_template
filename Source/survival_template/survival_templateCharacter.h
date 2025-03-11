@@ -84,6 +84,10 @@ protected:
 	void StopSprinting();
 	void StartSprinting();
 
+public:
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void ManageHealth();
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

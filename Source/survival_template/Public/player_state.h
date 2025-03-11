@@ -56,7 +56,8 @@ public:
 
     // Functions for Health and Stamina management
     UFUNCTION(BlueprintCallable, Category = "Player Stats")
-    void ModifyHealth(float Delta, float Rate);
+    //void ModifyHealth(float Delta, float Rate);
+    void ModifyHealth(float DamageAmount);
 
     UFUNCTION(BlueprintCallable, Category = "Player Stats")
     void ModifyStamina(float Delta, float Rate);

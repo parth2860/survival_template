@@ -203,6 +203,16 @@ void Asurvival_templateCharacter::HandleStamina()
 		//UE_LOG(LogTemp, Warning, TEXT("Stamina regeration: %.2f"), PlayerStateComponent->Stamina);
 	}
 }
+void Asurvival_templateCharacter::ManageHealth()
+{
+	//APlayerState_Health* PlayerState = GetPlayerState<APlayerState_Health>();
+	if (PlayerStateComponent)
+	{
+		//PlayerStateComponent->ApplyDamage(DamageAmount);
+		PlayerStateComponent->ModifyHealth(10);
+		ui_health();
+	}
+}
 void Asurvival_templateCharacter::Craft(const FInputActionValue& Value)
 {
 	if (PlayerStateComponent)
