@@ -21,11 +21,83 @@ void Asurvival_templateGameMode::BeginPlay()
 }
 void Asurvival_templateGameMode::SpawnResources()
 {
-    for (int i = 0; i < 10; i++) // Spawn 10 resources
-    {
-        FVector SpawnLocation = FVector(FMath::RandRange(-500, 500), FMath::RandRange(-500, 500), 50);
-        FRotator SpawnRotation = FRotator::ZeroRotator;
+    UE_LOG(LogTemp, Warning, TEXT("Game mode begin play - Spawning resources"));
 
-        AActor* SpawnedResource = GetWorld()->SpawnActor<AActor>(AActor::StaticClass(), SpawnLocation, SpawnRotation);
+    UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+    if (!NavSystem) return;
+
+    for (int i = 0; i < 50; i++) // Spawn 10 resources
+    {
+        FVector SpawnLocation;
+        FNavLocation RandomNavLocation;
+
+        // Ensure valid location within NavMesh
+        if (NavSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, 1000.0f, RandomNavLocation))
+        {
+            SpawnLocation = RandomNavLocation.Location;
+
+            // Randomly select between ResourceClass1 and ResourceClass2
+            TSubclassOf<AActor> ResourceToSpawn = (FMath::RandBool()) ? ResourceClass1 : ResourceClass2;
+
+            GetWorld()->SpawnActor<AActor>(ResourceToSpawn, SpawnLocation, FRotator::ZeroRotator);
+
+            UE_LOG(LogTemp, Warning, TEXT("Resource spawned at: %s"), *SpawnLocation.ToString());
+        }
+    }
+}
+void Asurvival_templateGameMode::OnDayStart()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Day Started - Spawning Resources"));
+
+    UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+    if (!NavSystem) return;
+
+    // Destroy any zombies remaining from the night
+    for (TActorIterator<AActor> ZombieItr(GetWorld(), ZombieClass); ZombieItr; ++ZombieItr)
+    {
+        (*ZombieItr)->Destroy();
+    }
+
+    // Spawn resources
+    for (int i = 0; i < 50; i++)
+    {
+        FNavLocation RandomNavLocation;
+        if (NavSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, 1000.0f, RandomNavLocation))
+        {
+            FVector SpawnLocation = RandomNavLocation.Location;
+
+            // Randomly select between ResourceClass1 (Wood) and ResourceClass2 (Rock)
+            TSubclassOf<AActor> ResourceToSpawn = (FMath::RandBool()) ? ResourceClass1 : ResourceClass2;
+            GetWorld()->SpawnActor<AActor>(ResourceToSpawn, SpawnLocation, FRotator::ZeroRotator);
+        }
+    }
+}
+
+void Asurvival_templateGameMode::OnNightStart()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Night Started - Spawning Zombies"));
+
+    UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+    if (!NavSystem) return;
+
+    // Destroy any resources remaining from the day
+    for (TActorIterator<AActor> ResourceItr(GetWorld(), ResourceClass1); ResourceItr; ++ResourceItr)
+    {
+        (*ResourceItr)->Destroy();
+    }
+    for (TActorIterator<AActor> ResourceItr(GetWorld(), ResourceClass2); ResourceItr; ++ResourceItr)
+    {
+        (*ResourceItr)->Destroy();
+    }
+
+    // Spawn zombies
+    for (int i = 0; i < 5; i++)
+    {
+        FNavLocation RandomNavLocation;
+        if (NavSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, 1000.0f, RandomNavLocation))
+        {
+            FVector SpawnLocation = RandomNavLocation.Location;
+            GetWorld()->SpawnActor<AActor>(ZombieClass, SpawnLocation, FRotator::ZeroRotator);
+        }
     }
 }

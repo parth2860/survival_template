@@ -292,14 +292,8 @@ void Asurvival_templateCharacter::PerformSphereTrace(UStaticMeshComponent* Weapo
 				if (Zombie)
 				{
 					// Apply damage to the zombie
-					Zombie->TakeDamage(5.0f, FDamageEvent(), GetController(), this);
+					Zombie->TakeDamage(30.0f, FDamageEvent(), GetController(), this);
 					
-					// If zombie health reaches 0, destroy it
-					/*if (Zombie->Health <= 0)
-					{
-						UE_LOG(LogTemp, Warning, TEXT("%s has died!"), *Zombie->GetName());
-						Zombie->Destroy();
-					}*/
 				}
 			}
 		}
